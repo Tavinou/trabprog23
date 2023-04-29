@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="br">
+  <head>
+    <title>Cadastro de Alunos</title>
+  </head>
+
+  <body>
+    <form id="meuform" onsubmit="return false;">
+      <p>
+        Nome: <input type="text" id="nome" name="nome" value="Maria Oliveira" />
+      </p>
+      <p>
+        Email:
+        <input type="text" id="email" name="email" value="maliv@gmail.com" />
+      </p>
+      <p>
+        Telefone:
+        <input
+          type="text"
+          id="telefone"
+          name="telefone"
+          value="47 91234 6789"
+        />
+      </p>
+      <p>
+        CPF: <input type="text" id="cpf" name="cpf" value="101.102.343-83" />
+      </p>
+      <p>
+        Curso: <input type="text" id="curso" name="curso" value="Informática" />
+      </p>
+      <button id="btIncluir" onsubmit="return false;">Incluir Aluno</button>
+    </form>
+
+    <script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
+
+    <script>
+      $(function () {
+        $(document).on("click", "#btIncluir", function () {
+          var rota = "http://localhost:5000/incluir_aluno";
+
+          var vetor_dados = $("#meuform").serializeArray();
+
+          var chave_valor = {};
+          for (var i = 0; i < vetor_dados.length; i++) {
+            chave_valor[vetor_dados[i]["name"]] = vetor_dados[i]["value"];
+          }
+
+          var dados_json = JSON.stringify(chave_valor);
+
+          var acao = $.ajax({
+            url: rota,
+            method: "POST",
+            dataType: "json",
+            contentType: "application/json",
+            data: dados_json,
+          });
+
+          acao.done(function (retorno) {
+            try {
+              if (retorno.resultado == "ok") {
+                alert("Aluno cadastrado com Sucesso!!");
+              } else {
+                alert("Deu algum erro no backend: " + retorno.detalhes);
+              }
+            } catch (error) {
+              alert(
+                "Erro ao tentar fazer o ajax: " +
+                  error +
+                  "\nResposta da ação: " +
+                  retorno
+              );
+            }
+          });
+
+          acao.fail(function (jqXHR, textStatus) {
+            mensagem = encontrarErro(jqXHR, textStatus, rota);
+            alert("Erro na chamada ajax: " + mensagem);
+          });
+        });
+
+        function encontrarErro(jqXHR, textStatus, rota) {
+          var msg = "";
+          if (jqXHR.status === 0) {
+            msg =
+              "Não foi possível conectar, " +
+              "verifique se o endereço do backend está certo" +
+              " e se o backend está rodando.";
+          } else if (jqXHR.status == 404) {
+            msg =
+              "A URL informada não foi encontrada no " +
+              "servidor [erro 404]: " +
+              rota;
+          } else if (jqXHR.status == 500) {
+            msg =
+              "Erro interno do servidor [erro 500], " +
+              "verifique nos logs do servidor";
+          } else if (textStatus === "parsererror") {
+            msg = "Falha ao decodificar o resultado json";
+          } else if (textStatus === "timeout") {
+            msg = "Tempo excessivo de conexão, estourou o limite (timeout)";
+          } else if (textStatus === "abort") {
+            msg = "Requisição abortada (abort)";
+          } else {
+            msg = "Erro desconhecido: " + jqXHR.responseText;
+          }
+          return msg;
+        }
+      });
+    </script>
+  </body>
+</html>
