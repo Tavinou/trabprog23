@@ -6,106 +6,185 @@
 
   <body>
     <form id="meuform" onsubmit="return false;">
-      <p>
-        Nome: <input type="text" id="nome" name="nome" value="Maria Oliveira" />
-      </p>
+      <p>Nome: <input type="text" id="nome" name="nome" value="" /></p>
       <p>
         Email:
-        <input type="text" id="email" name="email" value="maliv@gmail.com" />
+        <input type="text" id="email" name="email" value="" />
       </p>
       <p>
         Telefone:
-        <input
-          type="text"
-          id="telefone"
-          name="telefone"
-          value="47 91234 6789"
-        />
+        <input type="text" id="telefone" name="telefone" value="" />
       </p>
-      <p>
-        CPF: <input type="text" id="cpf" name="cpf" value="101.102.343-83" />
-      </p>
-      <p>
-        Curso: <input type="text" id="curso" name="curso" value="Informática" />
-      </p>
+      <p>Curso: <input type="text" id="curso" name="curso" value="" /></p>
+      <p>CPF: <input type="text" id="cpf" name="cpf" value="" /></p>
+
       <button id="btIncluir" onsubmit="return false;">Incluir Aluno</button>
     </form>
+
+    <table>
+      <thead>
+          <tr>
+              <th>id</th>
+              <th>Nome</th>
+              <th>Email</th>
+              <th>Telefone</th>
+              <th>Curso</th>
+              <th>CPF</th>
+          </tr>
+      </thead>
+      <tbody id="Alunos"></tbody>
+
+      </tbody>
+  </table>
+
 
     <script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
 
     <script>
-      $(function () {
-        $(document).on("click", "#btIncluir", function () {
-          var rota = "http://localhost:5000/incluir_aluno";
+            $(function () {
+              listagem_generica("alunos", ['id', 'nome', 'email', 'telefone', 'curso', 'cpf'], "<tr>", "<td>", "</td>");
 
-          var vetor_dados = $("#meuform").serializeArray();
+              $(document).on("click", "#btIncluir", function () {
+                var rota = "http://localhost:5000/incluir_aluno";
 
-          var chave_valor = {};
-          for (var i = 0; i < vetor_dados.length; i++) {
-            chave_valor[vetor_dados[i]["name"]] = vetor_dados[i]["value"];
-          }
+                var vetor_dados = $("#meuform").serializeArray();
 
-          var dados_json = JSON.stringify(chave_valor);
+                var chave_valor = {};
+                for (var i = 0; i < vetor_dados.length; i++) {
+                  chave_valor[vetor_dados[i]["name"]] = vetor_dados[i]["value"];
+                }
 
-          var acao = $.ajax({
-            url: rota,
-            method: "POST",
-            dataType: "json",
-            contentType: "application/json",
-            data: dados_json,
-          });
+                var dados_json = JSON.stringify(chave_valor);
 
-          acao.done(function (retorno) {
-            try {
-              if (retorno.resultado == "ok") {
-                alert("Aluno cadastrado com Sucesso!!");
-              } else {
-                alert("Deu algum erro no backend: " + retorno.detalhes);
-              }
-            } catch (error) {
-              alert(
-                "Erro ao tentar fazer o ajax: " +
-                  error +
-                  "\nResposta da ação: " +
-                  retorno
-              );
-            }
-          });
+                var acao = $.ajax({
+                  url: rota,
+                  method: "POST",
+                  dataType: "json",
+                  contentType: "application/json",
+                  data: dados_json,
+                });
 
-          acao.fail(function (jqXHR, textStatus) {
-            mensagem = encontrarErro(jqXHR, textStatus, rota);
-            alert("Erro na chamada ajax: " + mensagem);
-          });
-        });
+                acao.done(function (retorno) {
+                  try {
+                    if (retorno.resultado == "ok") {
+                      alert("Aluno cadastrado com Sucesso!!");
+                    } else {
+                      alert("Deu algum erro no backend: " + retorno.detalhes);
+                    }
+                  } catch (error) {
+                    alert(
+                      "Erro ao tentar fazer o ajax: " +
+                        error +
+                        "\nResposta da ação: " +
+                        retorno
+                    );
+                  }
+                });
 
-        function encontrarErro(jqXHR, textStatus, rota) {
-          var msg = "";
-          if (jqXHR.status === 0) {
-            msg =
-              "Não foi possível conectar, " +
-              "verifique se o endereço do backend está certo" +
-              " e se o backend está rodando.";
-          } else if (jqXHR.status == 404) {
-            msg =
-              "A URL informada não foi encontrada no " +
-              "servidor [erro 404]: " +
-              rota;
-          } else if (jqXHR.status == 500) {
-            msg =
-              "Erro interno do servidor [erro 500], " +
-              "verifique nos logs do servidor";
-          } else if (textStatus === "parsererror") {
-            msg = "Falha ao decodificar o resultado json";
-          } else if (textStatus === "timeout") {
-            msg = "Tempo excessivo de conexão, estourou o limite (timeout)";
-          } else if (textStatus === "abort") {
-            msg = "Requisição abortada (abort)";
-          } else {
-            msg = "Erro desconhecido: " + jqXHR.responseText;
-          }
-          return msg;
-        }
+                acao.fail(function (jqXHR, textStatus) {
+                  mensagem = encontrarErro(jqXHR, textStatus, rota);
+                  alert("Erro na chamada ajax: " + mensagem);
+                });
+              });
+
+              function listagem_generica(nome_div, lista_campos, elemento_html, html_antes, html_depois) {
+
+      // chamada ao backend
+      var rota = `http://127.0.0.1:5000/listar_alunos`;
+
+      // chamada ajax
+      var acao = $.ajax({
+          url: rota,
+          dataType: 'json', // os dados são recebidos no formato json,
       });
+
+      // se a chamada der certo
+      acao.done(function (retorno) {
+          // faz uma proteção contra erros
+          try {
+              if (retorno.resultado == "ok") {
+                  // percorrer a lista de pessoas retornadas;
+                  for (var reg of retorno.detalhes) { //p vai valer cada pessoa do vetor de pessoas
+                      // criar um parágrafo
+                      var paragrafo = $(elemento_html);
+                      // informar o HTML deste parágrafo
+                      // observe o apóstrofo inclinado, para interpretar as variáveis
+                      //paragrafo.html(`==> ${p.nome}, ${p.email}`);
+                      var s = '';
+                      for (campo of lista_campos) {
+                          // os campos pode ser acessados como
+                          // reg.campo
+                          // ou
+                          // reg[campo]
+                          // ***** se for um campo composto, estará descrito como, por exemplo: pessoa.nome
+                          // obs: só suporta 1 ponto até o momento
+
+                          // se tem "." no campo, precisa fazer o parse
+                          var teste = String(campo);
+                          if (teste.indexOf(".") !== -1) {
+                              // faz o parse
+                              var partes = teste.split(".");
+                              // pega o valor usando campo1.campo2
+                              var valor = reg[partes[0]][partes[1]];
+                              // o valor não está definido? Deu problema?
+                              if (valor == undefined) {
+                                  valor = "";
+                              }
+                              s = s + html_antes + valor + html_depois;
+                          } else {
+                              s = s + html_antes + reg[campo] + html_depois;
+                          }
+                      }
+                      paragrafo.html(`${s}`);
+                      // adicionar o parágrafo criado na div
+                      $('#' + nome_div).append(paragrafo);
+                  }
+              } else {
+                  alert("Erro informado pelo backend: " + retorno.detalhes);
+              }
+          } catch (error) { // se algo der errado...
+              alert("Erro ao tentar fazer o ajax: " + error +
+                  "\nResposta da ação: " + retorno.detalhes);
+          }
+      });
+
+      // se a chamada der erro
+      acao.fail(function (jqXHR, textStatus) {
+          mensagem = encontrarErro(jqXHR, textStatus, rota);
+          alert("Erro na chamada ajax: " + mensagem);
+      });
+
+    }
+
+
+              function encontrarErro(jqXHR, textStatus, rota) {
+                var msg = "";
+                if (jqXHR.status === 0) {
+                  msg =
+                    "Não foi possível conectar, " +
+                    "verifique se o endereço do backend está certo" +
+                    " e se o backend está rodando.";
+                } else if (jqXHR.status == 404) {
+                  msg =
+                    "A URL informada não foi encontrada no " +
+                    "servidor [erro 404]: " +
+                    rota;
+                } else if (jqXHR.status == 500) {
+                  msg =
+                    "Erro interno do servidor [erro 500], " +
+                    "verifique nos logs do servidor";
+                } else if (textStatus === "parsererror") {
+                  msg = "Falha ao decodificar o resultado json";
+                } else if (textStatus === "timeout") {
+                  msg = "Tempo excessivo de conexão, estourou o limite (timeout)";
+                } else if (textStatus === "abort") {
+                  msg = "Requisição abortada (abort)";
+                } else {
+                  msg = "Erro desconhecido: " + jqXHR.responseText;
+                }
+                return msg;
+              }
+            });
     </script>
   </body>
 </html>
