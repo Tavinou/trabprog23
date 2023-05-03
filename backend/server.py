@@ -26,10 +26,10 @@ with app.app_context():
 
     @app.route("/listar_alunos")
     def listar():
-        # obter os dados da classe informada
+       
         dados = db.session.query(Pessoa).all()
     
-        # converter dados para json
+        
         lista_jsons = [x.json() for x in dados]
 
         meujson = {"resultado": "ok"}
