@@ -59,11 +59,41 @@ margin-bottom: 1em;
 
 }
 
+.btIncluir {
+    min-width: 130px;
+    height: 40px;
+    color: #fff;
+    padding: 5px 10px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    display: inline-block;
+    outline: none;
+    border-radius: 5px;
+    border: none;
+    background: #3a86ff;
+    box-shadow: 0 5px #4433ff;
+    animation: pisca .9s linear infinite;
+  }
+  .btIncluir {
+    box-shadow: 0 3px #4433ff;
+    top: 1px;
+  }
+  .btIncluir {
+    box-shadow: 0 0 #4433ff;
+    top: 5px;
+  }
 
 
+  table, th, td {
+    border: 1px solid;
+  }
 
-
-
+  th, td {
+    width: 100px;
+    padding: 10px;
+  }
 
 
 
@@ -71,8 +101,9 @@ margin-bottom: 1em;
 /*body {
     animation: pisca .9s linear infinite;
 }
-
+*/
 @keyframes pisca {
     0% { background-color: rgb(111, 14, 207); }
     50% { background-color: #ff0000; }
     100% { background-color: #1a2847; }
+}

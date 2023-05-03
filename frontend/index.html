@@ -42,8 +42,9 @@
       </div>
       </fieldset>
 
-
-      <button id="btIncluir" onsubmit="return false;">Incluir Aluno</button>
+      <div class="camp">
+        <button class="btIncluir" onsubmit="return false;">Incluir Aluno</button>
+      </div>
     </form>
 
 
@@ -72,7 +73,7 @@
             $(function () {
               listagem_generica("alunos", ['id', 'nome', 'email', 'telefone', 'curso', 'cpf'], "<tr>", "<td>", "</td>");
 
-              $(document).on("click", "#btIncluir", function () {
+              $(document).on("click", ".btIncluir", function () {
                 var rota = "http://localhost:5000/incluir_aluno";
 
                 var vetor_dados = $("#meuform").serializeArray();
